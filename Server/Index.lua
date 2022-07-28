@@ -15,7 +15,6 @@ if map_path then
         local map_path_in_maps = "Server/Maps/" .. splited_map_path[1] .. ";" .. splited_map_path[2] .. ".lua"
         local map_files = Package.GetFiles("Server/Maps", ".lua")
         for i, v in ipairs(map_files) do
-            --print(v)
             if v == map_path_in_maps then
                 Package.Require(v)
                 print("Bottlefield : Map Config Loaded")
@@ -25,3 +24,5 @@ if map_path then
         end
     end
 end
+
+print("Bottlefield " .. Package.GetVersion() .. " Loaded")

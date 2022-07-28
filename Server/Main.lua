@@ -27,23 +27,9 @@ INIT_ROUNDS({
     ROUNDS_INTERVAL_ms = Rounds_Interval,
 
     CAN_JOIN_DURING_ROUND = true,
+
+    ROUNDS_DEBUG = true,
 })
-
-local r_events = {
-    "RoundEnding",
-    "RoundStart",
-    "RoundPlayerSpawned",
-    "RoundPlayerOut",
-    "RoundPlayerWaiting",
-    "RoundPlayerJoined",
-    "RoundPlayerOutDeath",
-}
-
-for k, v in pairs(r_events) do
-    Events.Subscribe(v, function(...)
-        print("bottlefield :", v, ...)
-    end)
-end
 
 Package.Subscribe("Load", function()
     for i, v in ipairs(FLAGS) do
@@ -64,7 +50,6 @@ Package.Subscribe("Load", function()
                     local team = ply:GetValue("PlayerTeam")
                     if team then
                         table.insert(Flags_Triggers[i].in_zone[team], ply)
-                        --print("Player added in zone", i)
                     end
                 end
             end
@@ -78,7 +63,6 @@ Package.Subscribe("Load", function()
                         for k3, v3 in pairs(v2) do
                             if v3 == ply then
                                 table.remove(Flags_Triggers[i].in_zone[k2], k3)
-                                --print("Player removed from zone", i)
                                 break
                             end
                         end
@@ -142,28 +126,18 @@ Weapon.Subscribe("Fire", function(weapon, char)
         local forward_vector = control_rotation:GetForwardVector()
         local spawn_location = weapon:GetLocation() + forward_vector * 100
 
-        local prop = Prop(spawn_location, weapon:GetRotation() + Rotator(0, -90, 0), Bottles_Collision_Model, CollisionType.Normal, true, false, false)
-        prop:SetLifeSpan(Bottles_Life_Span)
-        prop:SetScale(Bottles_Collision_Scale)
-        prop:SetValue("BottleShooter", char:GetPlayer():GetID(), false)
-
-        local bottle = Prop(spawn_location, weapon:GetRotation() + Rotator(0, -90, 0), Bottle_Model, CollisionType.NoCollision, true, false, false)
+        local bottle = Prop(spawn_location, weapon:GetRotation() + Rotator(0, -90, 0), Bottle_Model, CollisionType.Normal, true, false, false)
         bottle:SetScale(Bottle_Scale)
-        bottle:AttachTo(prop, AttachmentRule.SnapToTarget, "", 0)
-        bottle:SetRelativeLocation(Bottle_Relative_Location)
+        bottle:SetValue("BottleShooter", char:GetPlayer():GetID(), false)
+        bottle:SetLifeSpan(Bottles_Life_Span)
 
-        bottle:SetVisibility(false)
-        prop:SetVisibility(false)
-        bottle:SetVisibility(true)
-
-        prop:AddImpulse(forward_vector * Shoot_Force, true)
+        bottle:AddImpulse(forward_vector * Shoot_Force, true)
     end
 end)
 
 local APPLY_MULT_DAMAGE = false
 Character.Subscribe("TakeDamage", function(char, damage, bone, damage_type, from_direction, instigator, causer)
     if not APPLY_MULT_DAMAGE then
-        --print("TakeDamage", damage, char, damage_type, instigator, causer)
         if causer then
             if char:GetHealth() - damage > 0 then
                 APPLY_MULT_DAMAGE = true
@@ -241,11 +215,7 @@ Timer.SetInterval(function()
             new_captured_value = CaptureCalc(2, captured_percentage_add, captured_value)
         end
 
-        --[[if new_captured_value then
-            print(NanosUtils.Dump(captured_value), NanosUtils.Dump(new_captured_value))
-        end]]--
         if (new_captured_value and (new_captured_value[1] ~= captured_value[1] or new_captured_value[2] ~= captured_value[2])) then
-            --print("SetValue")
             flag_sm:SetValue("CapturedBy", new_captured_value, true)
         end
     end
@@ -301,8 +271,6 @@ Timer.SetInterval(function()
             end
         end
 
-        --print(team1_cflags, team2_cflags)
-
         if team1_cflags > team2_cflags then
             Teams_Points[2] = clamp(Teams_Points[2], 0, Start_Points, -(team1_cflags - team2_cflags))
             Events.BroadcastRemote("UpdateTeamsPoints", Teams_Points)
@@ -330,7 +298,6 @@ Character.Subscribe("Destroy", function(char)
                 for k3, v3 in pairs(v2) do
                     if v3 == ply then
                         table.remove(Flags_Triggers[k].in_zone[k2], k3)
-                        --print("Removed Character Destroy")
                         break
                     end
                 end
