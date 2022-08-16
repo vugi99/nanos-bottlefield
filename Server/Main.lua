@@ -126,7 +126,7 @@ Weapon.Subscribe("Fire", function(weapon, char)
         local forward_vector = control_rotation:GetForwardVector()
         local spawn_location = weapon:GetLocation() + forward_vector * 100
 
-        local bottle = Prop(spawn_location, weapon:GetRotation() + Rotator(0, -90, 0), Bottle_Model, CollisionType.Normal, true, false, false)
+        local bottle = Prop(spawn_location, weapon:GetRotation() + Rotator(0, -90, 0), Bottle_Model, CollisionType.Normal, true, GrabMode.Disabled, CCDMode.Disabled)
         bottle:SetScale(Bottle_Scale)
         bottle:SetValue("BottleShooter", char:GetPlayer():GetID(), false)
         bottle:SetLifeSpan(Bottles_Life_Span)
